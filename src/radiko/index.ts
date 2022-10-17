@@ -12,20 +12,17 @@ function analysis(xml: string) {
 	stations.forEach(
 		(station) => {
 			const name       = station.name as string;
-			const programs   = ((station.progs as Record<string, unknown>).prog as Array<Record<string, unknown>>);
+			const programs   = (station.progs as Record<string, unknown>).prog;
 			const programSet = [] as Array<unknown>;
+			const program    = Array.isArray(programs) ? programs[0] : programs;
 
-			programs.forEach(
-				(program) => {
-					programSet.push({
-						title: program.title,
-						time:  program.ftl,
-						img:   program.img,
-						info:  program.info,
-						pfm:   program.pfm,
-					});
-				}
-			);
+			programSet.push({
+				title: program.title,
+				time:  program.ftl,
+				img:   program.img,
+				info:  program.info,
+				pfm:   program.pfm,
+			});
 
 			result[name] = programSet;
 		}
