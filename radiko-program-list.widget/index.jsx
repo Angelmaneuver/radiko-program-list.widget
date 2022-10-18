@@ -50,9 +50,6 @@ export const updateState      = (event, previousState) => {
 
 	refreshFrequency = nextRefreshTime();
 
-	console.log(event);
-	console.log(refreshFrequency);
-
 	return {
 		type: STATUS.XML_RECEIVED,
 		data: assembly(Libraries.radiko.analysis(event.output)),
