@@ -39,16 +39,29 @@ const STATUS                  = {
 
 export const command          = `curl -sS -L https://radiko.jp/v3/program/now/JP13.xml`;
 
-export let   refreshFrequency = false;
+export const refreshFrequency = false;
 
 export const initialState     = { type: STATUS.STARTUP };
+
+export const init             = (dispatch) => {
+	setTimeout(
+		() => {
+			run(command).then(output => dispatch({ output: output })).catch(error => dispatch({ error: error }));
+			setInterval(
+				() => {
+					run(command).then(output => dispatch({ output: output })).catch(error => dispatch({ error: error }));
+				},
+				refreshInterval * (60 * 1000)
+			);
+		},
+		nextRefreshTime()
+	);
+}
 
 export const updateState      = (event, previousState) => {
 	if (event.error) {
 		return { ...previousState, warning: `We got an error: ${event.error}` };
 	}
-
-	refreshFrequency = nextRefreshTime();
 
 	return {
 		type: STATUS.XML_RECEIVED,
