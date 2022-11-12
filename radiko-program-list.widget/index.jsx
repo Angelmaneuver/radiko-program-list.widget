@@ -15,7 +15,6 @@ export const className        = `
 const Stations                = styled('div')(props => ({
 	maxHeight:     '58.5vh',
 
-	display:       'flex',
 	flexDirection: 'column',
 	width:         '30em',
 	overflowY:     'scroll',
@@ -34,7 +33,8 @@ const DESCRIPTION             = {
 const STATUS                  = {
 	STARTUP:      'RPL/STARTUP',
 	RELOAD:       'RPL/RELOAD',
-	XML_RECEIVED: 'RPL/XML_RECEIVED',
+	MINIMIZE:     'RPL/MINIMIZE',
+	MAXIMIZE:     'RPL/MAXIMIZE',
 };
 
 export const command          = `curl -sS -L https://radiko.jp/v3/program/now/JP13.xml`;
@@ -63,17 +63,24 @@ export const updateState      = (event, previousState) => {
 		return { ...previousState, warning: `We got an error: ${event.error}` };
 	}
 
-	return {
-		type: STATUS.XML_RECEIVED,
-		data: assembly(Libraries.radiko.analysis(event.output)),
+	if (STATUS.MINIMIZE === event.type || STATUS.MAXIMIZE === event.type) {
+		return { ...previousState, ...event };
 	}
+
+	return { ...previousState, data: assembly(Libraries.radiko.analysis(event.output)) };
 }
 
 export const render           = (props, dispatch) => {
 	return (
-		<div>
-			<Components.Molecuels.Reload
-				onClickReload = {() => {
+		<div
+			style = {{
+				width: '30em',
+			}}
+		>
+			<Components.Molecuels.Buttons
+				onClickMinimize = { STATUS.MINIMIZE !== props.type ? (() => dispatch({ type: STATUS.MINIMIZE })) : undefined }
+				onClickMaximize = { STATUS.MINIMIZE === props.type ? (() => dispatch({ type: STATUS.MAXIMIZE })) : undefined }
+				onClickReload   = {() => {
 					run(
 						command
 					).then(
@@ -87,8 +94,12 @@ export const render           = (props, dispatch) => {
 					)
 				}}
 			/>
-			<Stations>
-				{props.data}
+			<Stations
+				style = {{
+					display: STATUS.MINIMIZE === props.type ? 'none' : 'flex'
+				}}
+			>
+				{ props.data }
 			</Stations>
 		</div>
     );
