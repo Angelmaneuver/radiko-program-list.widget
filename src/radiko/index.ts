@@ -10,8 +10,9 @@ function analysis(xml: string) {
 	const stations = (parser.parse(xml)).radiko.stations.station as Array<Record<string, unknown>>;
 	const now      = (() => {
 		const datetime = new Date();
+		const hour     = 0 <= datetime.getHours() && 5 > datetime.getHours() ? 24 + datetime.getHours() : datetime.getHours();
 
-		return `${datetime.getHours().toString().padStart(2, '0')}${datetime.getMinutes().toString().padStart(2, '0')}`;
+		return `${hour.toString().padStart(2, '0')}${datetime.getMinutes().toString().padStart(2, '0')}`;
 	})();
 
 	stations.forEach(
